@@ -6,7 +6,7 @@ from math import acos, pi
 
 class Vector(object):
     CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
-    getcontext().prec = 30  # for better numerical precision
+    getcontext().prec = 10  # for better numerical precision
     def __init__(self, coordinates:list):
         """
         The initializer creates a VECTOR based on an input [LIST] of coordinates,
@@ -95,7 +95,6 @@ class Vector(object):
         """
         return sum([x*y for x,y in zip(self.coordinates, v.coordinates)])
 
-
     def angle_with(self, v, in_degrees=False):
         """
         Find the angle (smaller one) between two vectors in radians or degrees
@@ -119,6 +118,32 @@ class Vector(object):
             return angle_in_radians * degrees_per_radian
         else:
             return angle_in_radians
+
+    def is_orthogonal_to(self, v, tolerance=1e-10):
+        """
+        to see if the dot product of two vectors equals to 0.
+        :param v:
+        :param tolerance: due to precision issues
+        :return:boolean (True of False)
+        """
+        return abs(self.dot(v)) < tolerance
+
+    def is_parallel_to(self, v, tolerance=1e-4):
+        """
+
+        :param v:
+        :return: boolean (True or False)
+        """
+        return (
+            self.is_zero() or
+            v.is_zero() or
+            abs(self.angle_with(v)) < tolerance or
+            abs(abs(self.angle_with(v)) - pi) < tolerance
+        )
+
+    def is_zero(self, tolerance=1e-10):
+        return self.magnitude() < tolerance
+
 
 ## make a instance of a class Vector ##
 my_vector = Vector([1, 2, 3])
@@ -145,3 +170,14 @@ v8 = Vector([-4.496, -8.755, 7.103])
 v7.dot(v8).__str__()
 v7.angle_with(v8, in_degrees=False).__str__()
 
+## checking for Parallelism and Orthogonality ##
+v9 = Vector([-7.579, -7.88])
+v10 = Vector([22.737, 23.64])
+v9.is_orthogonal_to(v10)
+abs(abs(acos(v9.normalized().dot(v10.normalized()))) - pi) < 1e-4
+
+# return Decimal('-1.00000000000000012486519283418') 超出了acos()的定义域
+# 因此将小数点后面保留的位数再次减少，以去掉bug
+# 更改getcontext().prec = 10后，上式返回Decimal('-0.9999999999')，符合acos()的定义域
+v9.is_parallel_to(v10)
+# 结果还是False，有bug
