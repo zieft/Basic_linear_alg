@@ -1,15 +1,23 @@
+from decimal import Decimal
+from math import sqrt
+from decimal import getcontext
+from math import acos, pi
+
+
 class Vector(object):
+    CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
+    getcontext().prec = 30  # for better numerical precision
     def __init__(self, coordinates:list):
         """
         The initializer creates a VECTOR based on an input [LIST] of coordinates,
         and also set the dimensions of space the vector lives in.
         :param coordinates: should be a list
         """
-        from decimal import Decimal
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple([Decimal(x) for x in coordinates])
+            self.coordinates = tuple([Decimal(x) for x in coordinates])  # to ensure all coordinates are decimal object
+                                                                         #  instead of floating point numbers or integers.
             self.dimension = len(coordinates)
 
         except ValueError:
@@ -54,7 +62,8 @@ class Vector(object):
         :param c: the scalar to be multiplied
         :return: the result vector
         """
-        new_coordinates = [c*x for x in self.coordinates]
+        new_coordinates = [Decimal(c)*x for x in self.coordinates]
+        # number coming from outside should be treated as decimal.
         return Vector(new_coordinates)
 
     def magnitude(self):
@@ -63,7 +72,6 @@ class Vector(object):
         :return: The result scalar.
         """
         coordinates_square = [x**2 for x in self.coordinates]
-        from math import sqrt
         return sqrt(sum(coordinates_square))
 
     def normalized(self):
@@ -72,11 +80,12 @@ class Vector(object):
         :return: a direction vector with a magnitude of 1.
         """
         try:
-            magnitude = self.magnitude()
-            return self.times_scalar(1/magnitude)
+            magnitude = Decimal(self.magnitude())
+            return self.times_scalar(Decimal(1.0)/magnitude)
+            # number coming from outside should be treated as decimal.
 
         except ZeroDivisionError:
-            raise Exception('Cannot normalize zero vector!')
+            raise Exception(self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG)
 
     def dot(self, v):
         """
@@ -86,9 +95,6 @@ class Vector(object):
         """
         return sum([x*y for x,y in zip(self.coordinates, v.coordinates)])
 
-    CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
-    from decimal import getcontext
-    getcontext().prec = 30
 
     def angle_with(self, v, in_degrees=False):
         """
@@ -100,7 +106,6 @@ class Vector(object):
         try:
             u1 = self.normalized()
             u2 = v.normalized()
-            from math import acos, pi
             angle_in_radians = acos(u1.dot(u2))
 
         except Exception as e:
@@ -114,9 +119,6 @@ class Vector(object):
             return angle_in_radians * degrees_per_radian
         else:
             return angle_in_radians
-
-
-
 
 ## make a instance of a class Vector ##
 my_vector = Vector([1, 2, 3])
@@ -136,3 +138,10 @@ v5.times_scalar(c).__str__()
 v6 = Vector([8.813, -1.331, -6.247])
 v6.magnitude().__str__()
 v6.normalized().__str__()
+
+## solve the dot product and find angle between two vectors ##
+v7 = Vector([-5.955, -4.904, -1.874])
+v8 = Vector([-4.496, -8.755, 7.103])
+v7.dot(v8).__str__()
+v7.angle_with(v8, in_degrees=False).__str__()
+
