@@ -5,10 +5,11 @@ class Vector(object):
         and also set the dimensions of space the vector lives in.
         :param coordinates: should be a list
         """
+        from decimal import Decimal
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple(coordinates)
+            self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(coordinates)
 
         except ValueError:
@@ -76,6 +77,46 @@ class Vector(object):
 
         except ZeroDivisionError:
             raise Exception('Cannot normalize zero vector!')
+
+    def dot(self, v):
+        """
+        Find dot production of two vectors.
+        :param v:
+        :return: a scalar
+        """
+        return sum([x*y for x,y in zip(self.coordinates, v.coordinates)])
+
+    CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
+    from decimal import getcontext
+    getcontext().prec = 30
+
+    def angle_with(self, v, in_degrees=False):
+        """
+        Find the angle (smaller one) between two vectors in radians or degrees
+        :param v:
+        :param in_degrees:
+        :return:
+        """
+        try:
+            u1 = self.normalized()
+            u2 = v.normalized()
+            from math import acos, pi
+            angle_in_radians = acos(u1.dot(u2))
+
+        except Exception as e:
+            if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
+                raise Exception('Cannot compute an angle with the zero vector!')
+            else:
+                raise e
+
+        if in_degrees:
+            degrees_per_radian = 180 / pi
+            return angle_in_radians * degrees_per_radian
+        else:
+            return angle_in_radians
+
+
+
 
 ## make a instance of a class Vector ##
 my_vector = Vector([1, 2, 3])
