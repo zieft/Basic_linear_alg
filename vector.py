@@ -56,6 +56,27 @@ class Vector(object):
         new_coordinates = [c*x for x in self.coordinates]
         return Vector(new_coordinates)
 
+    def magnitude(self):
+        """
+        Find the magnitude of a Vector.
+        :return: The result scalar.
+        """
+        coordinates_square = [x**2 for x in self.coordinates]
+        from math import sqrt
+        return sqrt(sum(coordinates_square))
+
+    def normalized(self):
+        """
+        Find the direction of a Vector.
+        :return: a direction vector with a magnitude of 1.
+        """
+        try:
+            magnitude = self.magnitude()
+            return self.times_scalar(1/magnitude)
+
+        except ZeroDivisionError:
+            raise Exception('Cannot normalize zero vector!')
+
 ## make a instance of a class Vector ##
 my_vector = Vector([1, 2, 3])
 
@@ -70,3 +91,7 @@ v5 = Vector([1.671, -1.012, -0.318])
 c = 7.41
 v5.times_scalar(c).__str__()
 
+## find the magnitude and the direction ##
+v6 = Vector([8.813, -1.331, -6.247])
+v6.magnitude().__str__()
+v6.normalized().__str__()
