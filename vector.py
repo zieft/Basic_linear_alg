@@ -6,7 +6,7 @@ from math import acos, pi
 
 class Vector(object):
     CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
-    getcontext().prec = 10  # for better numerical precision
+    getcontext().prec = 14  # for better numerical precision
     def __init__(self, coordinates:list):
         """
         The initializer creates a VECTOR based on an input [LIST] of coordinates,
@@ -180,4 +180,3 @@ abs(abs(acos(v9.normalized().dot(v10.normalized()))) - pi) < 1e-4
 # 因此将小数点后面保留的位数再次减少，以去掉bug
 # 更改getcontext().prec = 10后，上式返回Decimal('-0.9999999999')，符合acos()的定义域
 v9.is_parallel_to(v10)
-# 结果还是False，有bug
