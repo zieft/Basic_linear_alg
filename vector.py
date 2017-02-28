@@ -1,7 +1,5 @@
-from decimal import Decimal
-from math import sqrt
-from decimal import getcontext
-from math import acos, pi
+from decimal import Decimal, getcontext
+from math import sqrt, acos, pi
 
 
 class Vector(object):
