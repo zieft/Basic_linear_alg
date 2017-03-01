@@ -167,6 +167,22 @@ class Vector(object):
             else:
                 raise e
 
+    def cross(self, v):
+        x_1, y_1, z_1 = self.coordinates
+        x_2, y_2, z_2 = v.coordinates
+        new_coordinates = [
+            y_1*z_2 - y_2*z_1,
+            -(x_1*z_2 - x_2*z_1),
+            x_1*y_2 - x_2*y_1
+        ]
+        return Vector(new_coordinates)
+
+    def area_of_triangle_with(self, v):
+        return self.area_of_triangle_with(v) / Decimal(2.0)
+
+    def area_of_parallelogram_with(self, v):
+        cross_product = self.cross(v)
+        return cross_product.magnitude()
 
 
 ## make a instance of a class Vector ##
@@ -210,3 +226,8 @@ v11 = Vector([3.009, -6.172, 3.692, -2.51])
 v12 = Vector([6.404, -9.144, 2.759, 8.718])
 print(v11.component_parallel_to(v12).__str__())
 print(v11.component_orthogonal_to(v12).__str__())
+
+## Cross product ##
+v13 = Vector([1.5, 9.547, 3.691])
+v14 = Vector([-6.007, 0.124, 5.772])
+v13.cross(v14).__str__()
