@@ -4,6 +4,8 @@ from math import sqrt, acos, pi
 
 class Vector(object):
     CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize zero vector!'
+    NO_UNIQUE_PARALLEL_COMPONENT_MSG = 'No unique parallel component!'
+    NO_UNIQUE_ORTHOGONAL_COMPONENT_MSG = 'No unique orthogonal component!'
     getcontext().prec = 14  # for better numerical precision
     def __init__(self, coordinates:list):
         """
@@ -142,6 +144,30 @@ class Vector(object):
     def is_zero(self, tolerance=1e-10):
         return self.magnitude() < tolerance
 
+    def component_orthogonal_to(self, basis):
+        try:
+            projection = self.component_parallel_to(basis)
+            return self.minus(projection)
+
+        except Exception as e:
+            if str(e) == self.NO_UNIQUE_PARALLEL_COMPONENT_MSG:
+                raise Exception(self.NO_UNIQUE_ORTHOGONAL_COMPONENT_MSG)
+            else:
+                raise e
+
+    def component_parallel_to(self, basis):
+        try:
+            u = basis.normalized()
+            weight = self.dot(u)
+            return  u.times_scalar(weight)
+
+        except Exception as e:
+            if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
+                raise Exception(self.NO_UNIQUE_PARALLEL_COMPONENT_MSG)
+            else:
+                raise e
+
+
 
 ## make a instance of a class Vector ##
 my_vector = Vector([1, 2, 3])
@@ -178,3 +204,9 @@ abs(abs(acos(v9.normalized().dot(v10.normalized()))) - pi) < 1e-4
 # 因此将小数点后面保留的位数再次减少，以去掉bug
 # 更改getcontext().prec = 10后，上式返回Decimal('-0.9999999999')，符合acos()的定义域
 v9.is_parallel_to(v10)
+
+## find projection ##
+v11 = Vector([3.009, -6.172, 3.692, -2.51])
+v12 = Vector([6.404, -9.144, 2.759, 8.718])
+print(v11.component_parallel_to(v12).__str__())
+print(v11.component_orthogonal_to(v12).__str__())
